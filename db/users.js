@@ -38,17 +38,14 @@ async function getUser({ username, password }) {
     const { rows: [user] } = await client.query(`
     SELECT id, username
     FROM users
-    WHERE password=${password};
-    `, [username, password]);
+    WHERE password = $1;
+    `, [password]);
 
     return user
   } catch (error) {
     console.error("Problem trying to getUser..")
     throw error
   }
-
-
-
   }
 
 async function getUserById(userId) {
@@ -56,15 +53,15 @@ async function getUserById(userId) {
     const {rows: [user]} = await client.query(`
     SELECT id, username
     FROM users
-    WHERE id = ${userId};
-    `)
+    WHERE id=$1;
+    `, [userId])
+    
     return user
   } catch (error) {
     console.error("Problem getting user by Id..")
     throw error
     
   }
-
 }
 
 async function getUserByUsername(userName) {
