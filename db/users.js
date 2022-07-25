@@ -15,7 +15,7 @@ async function createUser({ username, password }) {
     INSERT INTO users(username, password)
     VALUES($1, $2)
     ON CONFLICT (username) DO NOTHING
-    RETURNING username
+    RETURNING username;
     `,
       [username, password]
     );
@@ -31,19 +31,60 @@ async function createUser({ username, password }) {
 }
 
 async function getUser({ username, password }) {
-const user = await getUserByUserName(username);
+// const user = await getUserByUserName(username);
 // const hashedPassword = user.password;
 // const isValid = await bcrypt.compare(password, hashedPassword);
+  try {
+    const { rows: [user] } = await client.query(`
+    SELECT id, username
+    FROM users
+    WHERE password=${password};
+    `, [username, password]);
+
+    return user
+  } catch (error) {
+    console.error("Problem trying to getUser..")
+    throw error
+  }
 
 
 
-}
+  }
 
 async function getUserById(userId) {
+  try {
+    const {rows: [user]} = await client.query(`
+    SELECT id, username
+    FROM users
+    WHERE id = ${userId};
+    `)
+    return user
+  } catch (error) {
+    console.error("Problem getting user by Id..")
+    throw error
+    
+  }
 
 }
 
 async function getUserByUsername(userName) {
+  try {
+    const {
+      rows: [user],
+    } = await client.query(
+      `
+      SELECT *
+      FROM users
+      WHERE username=$1;
+    `,
+      [userName]
+    );
+
+    return user;
+  } catch (error) {
+    console.error("error getting user by username")
+    throw error;
+  }
 
 }
 
