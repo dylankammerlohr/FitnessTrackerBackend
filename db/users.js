@@ -15,7 +15,7 @@ async function createUser({ username, password }) {
     INSERT INTO users(username, password)
     VALUES($1, $2)
     ON CONFLICT (username) DO NOTHING
-    RETURNING username;
+    RETURNING username, id;
     `,
       [username, password]
     );
@@ -55,6 +55,7 @@ async function getUserById(userId) {
     FROM users
     WHERE id=$1;
     `, [userId])
+
     
     return user
   } catch (error) {
