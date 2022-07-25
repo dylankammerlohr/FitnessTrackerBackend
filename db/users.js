@@ -8,18 +8,24 @@ async function createUser({ username, password }) {
   // const SALT_COUNT = 10;
   // const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
-    const {rows: [user]} = await client.query(`
+    const {
+      rows: [user],
+    } = await client.query(
+      `
     INSERT INTO users(username, password)
     VALUES($1, $2)
     ON CONFLICT (username) DO NOTHING
-    RETURNING *;
-    `, [username, password])
+    RETURNING username
+    `,
+      [username, password]
+    );
 
-    return user
+    return user;
   } catch (error) {
-    console.error("Problems creating user..")
-    throw error
+    console.error("Problems creating user..");
+    throw error;
   }  
+
 
   
 }

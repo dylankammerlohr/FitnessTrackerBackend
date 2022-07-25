@@ -6,10 +6,10 @@ async function dropTables() {
   console.log("Starting to drop tables...")
   try {
     await client.query(`
-    DROP TABLE IF EXISTS users;
-    DROP TABLE IF EXISTS activities;
-    DROP TABLE IF EXISTS routines;
     DROP TABLE IF EXISTS routine_activities;
+    DROP TABLE IF EXISTS routines;
+    DROP TABLE IF EXISTS activities;
+    DROP TABLE IF EXISTS users;
     `);
     console.log('Finished dropping tables')
   } catch (error){
@@ -39,10 +39,10 @@ async function createTables() {
       name varchar(255) UNIQUE NOT NULL,
       goal TEXT NOT NULL
     );
-    CREATE TABLE routine_activites(
+    CREATE TABLE routine_activities(
        id SERIAL PRIMARY KEY,
-       "routineId" INTEGER REFERENCES routines(id),
-       "activityId" INTEGER REFERENCES activities(id),
+       "routineId" INTEGER REFERENCES routines ( id ),
+       "activityId" INTEGER REFERENCES activities ( id ),
        duration INTEGER,
        count INTEGER,
        UNIQUE ("routineId", "activityId")
