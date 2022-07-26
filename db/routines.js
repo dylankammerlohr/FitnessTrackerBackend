@@ -23,22 +23,28 @@ async function getRoutinesWithoutActivities() {}
 
 async function getAllRoutines() {
   try {
-    const {rows : [routine]} = await client.query(`
-    SELECT * FROM routines
-    JOIN users ON username = "creatorName"
-    JOIN activities ON 
-    ;
-    `)
-    const {rows: [user]} = await client.query(`
-    SELECT username 
-    FROM users
-    JOIN ;
-    `)
-    const {rows : [activity]} = await client.query(`
-    SELECT "routineId",  
-    FROM activities;
+    const {rows : routine} = await client.query(`
+    SELECT * 
+    FROM routines;
     `)
 
+    // const {rows : user } = await client.query(`
+    // SELECT username AS "creatorName" 
+    // FROM users
+    // JOIN routines ON users.username =  routines."creatorName"
+    // ;
+    // `, [user.username])
+
+    const {rows: activity} = await client.query(`
+    SELECT activities.*
+    FROM activities
+    JOIN routine_activities ON activities.id = routine_activities."activityId"
+    WHERE routine_activities."routineId" = $1 
+    `, [routine.id])
+
+    // routine.creatorName = user
+    routine.activity = activity
+   
     return routine
   } catch (error) {
     console.error("error getting all routines")
