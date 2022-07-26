@@ -5,7 +5,18 @@ async function addActivityToRoutine({
   activityId,
   count,
   duration,
-}) {}
+}) {
+  try {
+    const { rows: [routine_activity]} = await client.query(`
+    
+    `)
+
+    return routine_activity
+  } catch (error){
+    console.error("error with addActivityToRoutine")
+    throw error
+  }
+}
 
 async function getRoutineActivityById(id) {}
 
