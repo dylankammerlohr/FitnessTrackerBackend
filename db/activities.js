@@ -106,22 +106,23 @@ async function updateActivity({ id, ...fields }) {
   const setString = Object.keys(fields)
   .map((key, index)=> `"${key}"=$${index + 1}`).join(",")
 
-
+  if (setString === 0){
+    return
+  }
 
   try {
-    const {rows : activities } = client.query(`
-    
-    
-    `)
+    const {rows : [activity] } = await client.query(`
+    UPDATE activities
+    SET ${setString}
+    WHERE id = ${id}
+    RETURNING *
+    `, Object.values(fields))
 
-    return activities
+    return activity
   } catch (error) {
     console.error("Error updating the Activity")
     throw error
   }
-  // don't try to update the id
-  // do update the name and description
-  // return the updated activity
 }
 
 module.exports = {
