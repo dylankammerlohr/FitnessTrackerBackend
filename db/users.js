@@ -1,5 +1,5 @@
 const client = require("./client");
-const bcrypt = require("bcrypt")
+// const bcrypt = require("bcrypt")
 
 // database functions
 
@@ -30,6 +30,7 @@ async function createUser({ username, password }) {
   
 }
 
+// eslint-disable-next-line no-unused-vars
 async function getUser({ username, password }) {
 // const user = await getUserByUserName(username);
 // const hashedPassword = user.password;
