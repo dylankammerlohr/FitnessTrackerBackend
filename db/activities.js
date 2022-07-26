@@ -16,7 +16,6 @@ async function createActivity({ name, description }) {
   } catch (error) {
     console.error("Error creating new activity")
     throw error
-    
   }
 }
 
@@ -31,9 +30,7 @@ async function getAllActivities() {
   } catch (error) {
     console.error("error getting all Activities")
     throw error
-    
   }
-  
 }
 
 async function getActivityById(id) {
