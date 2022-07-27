@@ -26,7 +26,7 @@ async function getRoutineById(id) {
     WHERE id = $1
     ;
     `,[id]);
-    console.log(routine, "routine");
+    // console.log(routine, "routine");
     return routine;
   } catch (error) {
     console.error("error getting all routines");
@@ -40,7 +40,7 @@ async function getRoutinesWithoutActivities() {
     SELECT * 
     FROM routines;
     `);
-    console.log(routine, "routine");
+    // console.log(routine, "routine");
     return routine;
   } catch (error) {
     console.error("error getting all routines");
@@ -66,6 +66,7 @@ async function getAllRoutines() {
     // ON activities.id=routine_activities."routineId"
     // ;
     // `)
+    routine.activity = activity
     // // routine.activity.map((activity)=>activity.id)
     // // console.log(rows,'activities')
     // routine.activity = activity.map(activity=>activity.id)
@@ -145,25 +146,24 @@ async function getPublicRoutinesByActivity({ id }) {
     const { rows: routine } = await client.query(`
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
-    JOIN users
-    ON routines."creatorId"=users.id
+    JOIN users ON routines."creatorId"=users.id
+    JOIN routine_activities ON routine_activities."routineId" = routines.id
     WHERE routines."isPublic" = true
+    AND routine_activities."activityId" = $1
     ;
-    `);
-    const activity = await getActivityById(id);
-    routine.activity = activity;
-    let activiti = await attachActivitiesToRoutines(routine);
+    `, [id]);
+  
+    
     // let activitys = activity.filter((e)=>activity.id===id)
     // console.log(routine)
 
     
-    return routine;
+    return attachActivitiesToRoutines(routine);
   } catch (error) {
     console.error("error getting all routines");
     throw error;
   }
 }
-
 async function updateRoutine({ id, ...fields }) {
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
@@ -227,4 +227,4 @@ module.exports = {
   createRoutine,
   updateRoutine,
   destroyRoutine,
-};
+}
