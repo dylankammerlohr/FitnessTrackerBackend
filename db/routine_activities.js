@@ -1,4 +1,5 @@
 const client = require("./client");
+const { destroyRoutine } = require("./routines");
 
 async function addActivityToRoutine({
   routineId,
@@ -13,7 +14,7 @@ async function addActivityToRoutine({
     ON CONFLICT ("routineId", "activityId") DO NOTHING
     RETURNING "routineId", "activityId", count, duration, id;
     `, [routineId, activityId, count, duration])
-
+    // console.log(routine_activity[4],'eeeee')
     return routine_activity
   } catch (error){
     console.error("error with addActivityToRoutine")
@@ -29,7 +30,7 @@ async function getRoutineActivityById(id) {
     WHERE id = $1
     ;
     `,[id]);
-    
+    // console.log(routine_activity,'ddddddd')
     return routine_activity;
   } catch (error) {
     console.error("error getting all routines");
@@ -78,14 +79,16 @@ async function updateRoutineActivity({ id, ...fields }) {
 
 async function destroyRoutineActivity(id) {
   try {
-    const { rows } = await client.query(`
-    DELETE  
+      const { rows: routine_activities } = await client.query(`
+    DELETE 
     FROM routine_activities
-    WHERE id = $1;
+    WHERE id = $1
+    RETURNING *;
     `, [id]);
+    
 
-    console.log(rows, id, "routineActivity");
-    return rows;
+    console.log(routine_activities, id, "routineActivity");
+    return routine_activities[0];
   } catch (error) {
     console.error("error destroying routineActivity");
     throw error;
@@ -94,18 +97,28 @@ async function destroyRoutineActivity(id) {
 
 async function canEditRoutineActivity(routineActivityId, userId) {
   try{
-    const {rows: [routine]} = await client.query(`
+    const {rows: [routine_activity]} = await client.query(`
     SELECT *
-    FROM routines
+    FROM routine_activities 
+    JOIN routines ON routine_activities."routineId" = routines.id
     WHERE "creatorId" = ${userId}
+    AND routine_activities.id = ${routineActivityId}
+    ;
     `)
     // if(routine.creatorId !== userId){
     //   return false
     // } else {
     //   return true
     // }
-    console.log(routine, "edit function")
-    return routine
+     console.log(routine_activity, "edit function")
+    // if(routine_activity.id === userId){
+    //   return true
+    // }
+    // else{
+      return routine_activity
+      
+    
+   
   } catch (error){
     console.error("Error with canEditRoutineActivity")
     throw error

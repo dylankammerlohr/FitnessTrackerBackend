@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 const client = require("./client");
-const { attachActivitiesToRoutines,getActivityById } = require("./activities");
+const { attachActivitiesToRoutines } = require("./activities");
 
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
@@ -204,6 +205,7 @@ async function destroyRoutine(id) {
     DELETE 
     FROM routines
     WHERE id = $1
+    RETURNING *
     ;
     `,
       [id]
