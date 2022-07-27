@@ -1,4 +1,5 @@
 const client = require("./client");
+const { attachActivitiesToRoutines } = require("./activities");
 
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
@@ -19,33 +20,47 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 
 async function getRoutineById(id) {}
 
-async function getRoutinesWithoutActivities() {}
+async function getRoutinesWithoutActivities() {
+  try {
+    const { rows: routine } = await client.query(`
+    SELECT * 
+    FROM routines;
+    `);
+    console.log(routine, "routine");
+    return routine;
+  } catch (error) {
+    console.error("error getting all routines");
+    throw error;
+  }
+}
 
 async function getAllRoutines() {
   try {
-    const {rows : routine} = await client.query(`
-    SELECT * 
-    FROM routines;
-    `)
-
-    // const {rows : user } = await client.query(`
-    // SELECT username AS "creatorName" 
-    // FROM users
-    // JOIN routines ON users.username =  routines."creatorName"
+    const { rows: routine } = await client.query(`
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users
+    ON routines."creatorId"=users.id
+    ;
+    `);
+    const activity = await attachActivitiesToRoutines(routine) 
+    // console.log(activity,'activities')
+    // const {rows: activity} = await client.query(`
+    // SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."routineId",routine_activities."activityId"
+    // FROM activities
+    // JOIN routine_activities
+    // ON activities.id=routine_activities."routineId"
     // ;
-    // `, [user.username])
+    // `)
+    // // routine.activity.map((activity)=>activity.id)
+    // // console.log(rows,'activities')
+    // routine.activity = activity.map(activity=>activity.id)
+    // routine.activities.id = activity[0].id
+    // console.log(routine.activities.id,'routine activities')
 
-    const {rows: activity} = await client.query(`
-    SELECT activities.*
-    FROM activities
-    JOIN routine_activities ON activities.id = routine_activities."activityId"
-    WHERE routine_activities."routineId" = $1 
-    `, [routine.id])
-
-    // routine.creatorName = user
-    routine.activity = activity
-   
+    console.log(activity)
     return routine
+    
   } catch (error) {
     console.error("error getting all routines")
     throw error
