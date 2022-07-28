@@ -7,6 +7,7 @@ require("dotenv").config();
 const faker = require("faker");
 const client = require("../../db/client");
 const {
+  // eslint-disable-next-line no-unused-vars
   getRoutineById,
   getAllRoutines,
   getAllPublicRoutines,

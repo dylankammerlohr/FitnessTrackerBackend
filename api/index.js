@@ -1,9 +1,26 @@
 const express = require('express');
-const cors = require("cors");
+// const cors = require("cors");
 const router = express.Router();
 
 // GET /api/health
-router.get('/health', async (req, res, next) => {
+
+
+router.get('/health', (req, res, next) => {
+    try {
+        // console.log(req.body.message)
+        let response = 'fff';
+        // response.body.message = 'response'
+        // res.body.message= response
+        // console.log(res)
+        res.status(200).send((response))
+        
+        // next()
+  
+    } catch (error) {
+        console.error
+        throw error
+        
+    }
 });
 
 // ROUTER: /api/users
@@ -22,4 +39,9 @@ router.use('/routines', routinesRouter);
 const routineActivitiesRouter = require('./routineActivities');
 router.use('/routine_activities', routineActivitiesRouter);
 
+
+
+// router.get("/:unknown", async(req,res)=>{
+//     await res.status(404).send("Not a valid url")
+// })
 module.exports = router;
