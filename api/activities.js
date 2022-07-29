@@ -54,7 +54,6 @@ router.post('/', requireUser, async (req, res, next) => {
 // GET /api/activities/:activityId/routines
 router.get("/:activityId/routines", async (req, res, next) => {
     const { activityId } = req.params
-    console.log(activityId, 'bbbb')
 
     
     try {
@@ -67,7 +66,6 @@ router.get("/:activityId/routines", async (req, res, next) => {
         }) 
      }    
         const actIdRoutines = await getPublicRoutinesByActivity(noActivity)
-        console.log(actIdRoutines, 'aaa')
         
         if (actIdRoutines && actIdRoutines.length > 0){
             res.send(actIdRoutines)

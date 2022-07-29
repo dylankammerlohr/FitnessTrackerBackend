@@ -12,7 +12,6 @@ router.use((req, res, next) => {
 router.get("/", async (req, res, next) => {
     try {
        const allroutines = await getAllPublicRoutines()
-       console.log(allroutines)
         
 
         res.send(allroutines)
@@ -25,32 +24,32 @@ router.get("/", async (req, res, next) => {
 
 // POST /api/routines
 router.post("/", requireUser, async (req, res, next) => {
-  const { isPublic, name, goal } = req.body;
-  console.log(req.body);
+  const { isPublic, name, goal, creatorId } = req.body;
 
   const data = {};
 
-  //   try {
+    try {
   data.isPublic = isPublic;
   data.name = name;
   data.goal = goal;
-  // data.creatorId = req.user.id
+  data.creatorId = req.user.id
   const newroutine = await createRoutine(data);
     // delete newroutine.id
-    delete newroutine.creatorName
+    
  
-  console.log(newroutine, "sss");
   if(newroutine.creatorId == req.user.id){
+//   delete newroutine.creatorId
+  delete newroutine.id
   res.send( newroutine );
 }
-  //   next({
-  //     name: "UnauthorizedUserError",
-  //     message: "You cannot update a post that is not yours",
-  //   });
-  // }
-  //   } catch ({ name, message }) {
-  //     next({ name, message });
-  //   }
+    next({
+      name: "UnauthorizedUserError",
+      message: "You cannot update a post that is not yours",
+    });
+    
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
 });
 
 // PATCH /api/routines/:routineId
