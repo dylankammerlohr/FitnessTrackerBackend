@@ -66,10 +66,10 @@ router.get("/:activityId/routines", async (req, res, next) => {
             name: "ActivityNotFoundError"
         }) 
      }    
-        const actIdRoutines = await getPublicRoutinesByActivity({activityId})
+        const actIdRoutines = await getPublicRoutinesByActivity(noActivity)
         console.log(actIdRoutines, 'aaa')
-
-        if (actIdRoutines !== [] ){
+        
+        if (actIdRoutines && actIdRoutines.length > 0){
             res.send(actIdRoutines)
         }
         

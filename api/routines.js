@@ -1,5 +1,4 @@
 const express = require('express');
-const { response } = require('../app');
 const { getAllRoutines, getAllPublicRoutines, createRoutine } = require('../db');
 const { requireUser } = require('./utils');
 const router = express.Router();

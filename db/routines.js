@@ -156,10 +156,11 @@ async function getPublicRoutinesByActivity({ id }) {
   
     
     // let activitys = activity.filter((e)=>activity.id===id)
-    // console.log(routine)
-
     
-    return attachActivitiesToRoutines(routine);
+
+    const activity = await attachActivitiesToRoutines(routine)
+    console.log(routine)
+    return routine ;
   } catch (error) {
     console.error("error getting all routines");
     throw error;
