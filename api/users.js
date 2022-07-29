@@ -98,7 +98,7 @@ router.get('/:username/routines', requireUser, async (req, res, next) => {
         
         if(req.user.id === user.id){
             const allRoutines = await getAllRoutinesByUser(user)
-            console.log(allRoutines, 'bbbbb')
+            // console.log(allRoutines, 'bbbbb')
             res.send(allRoutines)
         } 
         else {
@@ -116,7 +116,7 @@ router.get('/:username/routines', requireUser, async (req, res, next) => {
 router.get('/me', requireUser, async (req, res, next) => {
     const user = await req.user
     res.send(user)
-    console.log(req.user, 'aaaa')
+    // console.log(req.user, 'aaaa')
     // if(!req.user){
         
     //     res.status(401).send(UnauthorizedError)
