@@ -49,7 +49,35 @@ router.post('/', requireUser, async (req, res, next) => {
     }
 })
 
-// router.post("/api/activities");
+
+
+// GET /api/activities/:activityId/routines
+router.get("/:activityId/routines", async (req, res, next) => {
+    const { activityId } = req.params
+    console.log(activityId, 'bbbb')
+
+    
+    try {
+        const noActivity = await getActivityById(activityId)
+        if(!noActivity){
+        res.send({
+            error: "error",
+            message: ActivityNotFoundError(activityId),
+            name: "ActivityNotFoundError"
+        }) 
+     }    
+        const actIdRoutines = await getPublicRoutinesByActivity({activityId})
+        console.log(actIdRoutines, 'aaa')
+
+        if (actIdRoutines !== [] ){
+            res.send(actIdRoutines)
+        }
+        
+    } catch ({name, message, error}) {
+        next({name, message, error})
+    }
+
+})
 
 // // PATCH /api/activities/:activityId
 router.patch('/:activityId', requireUser, async (req, res, next) => {
@@ -97,21 +125,5 @@ router.patch('/:activityId', requireUser, async (req, res, next) => {
     }
 })
 
-// GET /api/activities/:activityId/routines
-// router.get("/:activityId/routines", async (req, res, next) => {
-//     const { activityId } = req.params
-    
-//     try {
-//         const actIdRoutines = await getPublicRoutinesByActivity(activityId)
-//         console.log(actIdRoutines, 'aaa')
-
-//     } catch ({name, message, error}) {
-//         next({name, message, error})
-//     }
-// })
-
-router.get('/:activityId/routines', async (req, res, next) => {
-    
-})
 
 module.exports = router;
