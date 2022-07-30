@@ -3,8 +3,7 @@ const express = require("express");
 const { createUser, getUserByUsername, getPublicRoutinesByUser, getAllRoutinesByUser } = require("../db");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = process.env
-const {UserTakenError, PasswordTooShortError, UnauthorizedError} = require('../errors')
+const {UserTakenError, PasswordTooShortError} = require('../errors')
 const { requireUser } = require('./utils')
 
 // POST /api/users/register
@@ -86,7 +85,7 @@ router.post('/login', async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     next(error);
   }
 })
@@ -104,10 +103,8 @@ router.get('/:username/routines', requireUser, async (req, res, next) => {
             const routines = await getPublicRoutinesByUser(user)
             res.send(routines)
         }
-       
-        
     } catch(error){
-        throw error
+        next(error)
     }
 })
 

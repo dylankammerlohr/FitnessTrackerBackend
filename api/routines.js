@@ -5,35 +5,27 @@ const {
   DuplicateRoutineActivityError
 } = require("../errors");
 const {
-  getAllRoutines,
   getAllPublicRoutines,
   createRoutine,
   updateRoutine,
-  getAllRoutinesByUser,
-  getActivityById,
   getRoutineById,
   destroyRoutine,
-  destroyRoutineActivity,
-  updateActivity,
   addActivityToRoutine,
-  getRoutineActivityById,
-  getRoutineActivitiesByRoutine,
-  getAllActivities,
 } = require("../db");
 const { requireUser } = require("./utils");
 const router = express.Router();
 
 router.use((req, res, next) => {
   console.log("A request is being made to /routines");
-
   next();
 });
+
 // GET /api/routines
 router.get("/", async (req, res, next) => {
   try {
     const allroutines = await getAllPublicRoutines();
-
     res.send(allroutines);
+
   } catch (message) {
     next();
   }
@@ -41,7 +33,7 @@ router.get("/", async (req, res, next) => {
 
 // POST /api/routines
 router.post("/", requireUser, async (req, res, next) => {
-  const { isPublic, name, goal, creatorId } = req.body;
+  const { isPublic, name, goal } = req.body;
 
   const data = {};
 
@@ -68,7 +60,7 @@ router.post("/", requireUser, async (req, res, next) => {
 // PATCH /api/routines/:routineId
 router.patch("/:routineId", requireUser, async (req, res, next) => {
   const { routineId } = req.params;
-  const { name, isPublic, goal, creatorId } = req.body;
+  const { name, isPublic, goal } = req.body;
 
   const data = {};
   try {
@@ -99,9 +91,6 @@ router.patch("/:routineId", requireUser, async (req, res, next) => {
 router.delete("/:routineId", requireUser, async (req, res, next) => {
   const { routineId } = req.params;
 
-  const { name, isPublic, goal, creatorId } = req.body;
-
-  const data = {};
   try {
     const routId = await getRoutineById(routineId);
 
@@ -120,32 +109,28 @@ router.delete("/:routineId", requireUser, async (req, res, next) => {
     next(error);
   }
 });
+
 // POST /api/routines/:routineId/activities
 router.post("/:routineId/activities", requireUser, async (req, res, next) => {
-    const {routineId} = req.params
+  const {routineId} = req.params
   const { activityId, count, duration } = req.body;
 
   const data = {};
-    const dup = {}
+
   try {
     data.routineId = routineId
     data.activityId = activityId;
     data.count = count;
     data.duration = duration
-    
+
     const newroutine = await addActivityToRoutine(data);
-    console.log(newroutine)
-    // if (newroutine.creatorId == req.user.id) {
-    //   delete newroutine.id;
-   const all = await getRoutineActivitiesByRoutine(routineId)
-   console.log(all, 'ddddd')
-     if(newroutine) {res.send(newroutine);
-     }else {
-        dup.routineId = all.activityId;
-        dup.activityId = all.activityId;
+
+    if(newroutine) 
+      {res.send(newroutine);
+    }else {
     next({
       name: "UnauthorizedUserError",
-      message: DuplicateRoutineActivityError(dup.routineId, dup.activityId),
+      message: DuplicateRoutineActivityError(routineId, activityId),
       error: "error",
     });}
   } catch (error) {

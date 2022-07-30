@@ -1,5 +1,5 @@
 const express = require('express');
-const { getRoutineActivityById, updateRoutineActivity, getRoutineById, destroyRoutineActivity, canEditRoutineActivity } = require('../db');
+const { getRoutineActivityById, updateRoutineActivity, getRoutineById, destroyRoutineActivity } = require('../db');
 const { UnauthorizedUpdateError, UnauthorizedDeleteError } = require('../errors');
 const { requireUser } = require('./utils');
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 // PATCH /api/routine_activities/:routineActivityId
 router.patch('/:routineActivityId', requireUser, async (req, res, next)=>{
  const { routineActivityId } = req.params;
-  const { routineId, activityId, duration, count, id } = req.body;
+  const { duration, count } = req.body;
 
   const data = {};
   try {
@@ -17,7 +17,6 @@ router.patch('/:routineActivityId', requireUser, async (req, res, next)=>{
     data.duration = duration;
     data.count = count;
     data.id = routId.id;
-    console.log(name, 'name',data, 'ddata')
     
     if (name.creatorId == req.user.id) {
       const updatedActivity = await updateRoutineActivity(data);
@@ -38,7 +37,7 @@ router.patch('/:routineActivityId', requireUser, async (req, res, next)=>{
 // DELETE /api/routine_activities/:routineActivityId
 router.delete("/:routineActivityId", requireUser, async (req, res, next) => {
   const { routineActivityId } = req.params;
-  const { routineId, activityId, duration, count, id } = req.body;
+ 
   try {
     const routId = await getRoutineActivityById(routineActivityId);
     const name = await getRoutineById(routId.routineId);

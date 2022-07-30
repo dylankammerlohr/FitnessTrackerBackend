@@ -1,6 +1,4 @@
-const { Router } = require('express');
 const express = require('express');
-const { reset } = require('nodemon');
 const { getAllActivities, getPublicRoutinesByActivity, createActivity, getActivityById, updateActivity, getActivityByName } = require('../db');
 const { ActivityExistsError, UnauthorizedError, ActivityNotFoundError } = require('../errors');
 const { requireUser } = require('./utils');
@@ -55,7 +53,6 @@ router.post('/', requireUser, async (req, res, next) => {
 router.get("/:activityId/routines", async (req, res, next) => {
     const { activityId } = req.params
 
-    
     try {
         const noActivity = await getActivityById(activityId)
         if(!noActivity){
@@ -74,7 +71,6 @@ router.get("/:activityId/routines", async (req, res, next) => {
     } catch ({name, message, error}) {
         next({name, message, error})
     }
-
 })
 
 // // PATCH /api/activities/:activityId
@@ -83,6 +79,7 @@ router.patch('/:activityId', requireUser, async (req, res, next) => {
     const { name, description } = req.body
     
     const newActivityData = {}
+
  try {
     const noActivity = await getActivityById(activityId)
     if(!noActivity){
@@ -92,7 +89,6 @@ router.patch('/:activityId', requireUser, async (req, res, next) => {
             name: "ActivityNotFoundError"
         })
     }
-
     const activityName = await getActivityByName(name)
     if(activityName){
         res.send({
@@ -101,27 +97,24 @@ router.patch('/:activityId', requireUser, async (req, res, next) => {
             error: "error",
         })
     }
-
+    newActivityData.name = name
+    newActivityData.description = description
+    newActivityData.id = req.params.activityId
    
-        newActivityData.name = name
-        newActivityData.description = description
-        newActivityData.id = req.params.activityId
-   
-        if (req.user){
+    if (req.user){
             const updatedActivity = await updateActivity(newActivityData)
             res.send(updatedActivity)
-        } 
-        else {
-            next({
-                name:"UnathorizedActivityError",
-                message: UnauthorizedError(),
-                error: "error"
-            })
-        }
+    } 
+    else {
+        next({
+            name:"UnathorizedActivityError",
+            message: UnauthorizedError(),
+            error: "error"
+        })
+    }
     } catch ({name, message, error}) {
         next({name, message, error})
     }
 })
-
 
 module.exports = router;
