@@ -21,13 +21,13 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 
 async function getRoutineById(id) {
   try {
-    const { rows: routine } = await client.query(`
+    const { rows: [routine] } = await client.query(`
     SELECT * 
     FROM routines
     WHERE id = $1
     ;
     `,[id]);
-    // console.log(routine, "routine");
+    console.log(routine, "routine");
     return routine;
   } catch (error) {
     console.error("error getting all routines");

@@ -1,5 +1,9 @@
 const express = require("express");
-const {UnauthorizedUpdateError} = require('../errors')
+const {
+  UnauthorizedUpdateError,
+  UnauthorizedDeleteError,
+  DuplicateRoutineActivityError
+} = require("../errors");
 const {
   getAllRoutines,
   getAllPublicRoutines,
@@ -8,6 +12,13 @@ const {
   getAllRoutinesByUser,
   getActivityById,
   getRoutineById,
+  destroyRoutine,
+  destroyRoutineActivity,
+  updateActivity,
+  addActivityToRoutine,
+  getRoutineActivityById,
+  getRoutineActivitiesByRoutine,
+  getAllActivities,
 } = require("../db");
 const { requireUser } = require("./utils");
 const router = express.Router();
@@ -57,39 +68,27 @@ router.post("/", requireUser, async (req, res, next) => {
 // PATCH /api/routines/:routineId
 router.patch("/:routineId", requireUser, async (req, res, next) => {
   const { routineId } = req.params;
-//   const isUsersRoutine = await getAllRoutinesByUser(req.user);
-//   console.log(isUsersRoutine);
   const { name, isPublic, goal, creatorId } = req.body;
 
   const data = {};
   try {
-    // const noActivity = await getActivityById(activityId);
-    // if (!noActivity) {
-    //   res.send({
-    //     error: "error",
-    //     message: ActivityNotFoundError(activityId),
-    //     name: "ActivityNotFoundError",
-    //   });
-    // }
-    const routId = await getRoutineById(routineId)
-    console.log(routId,'dddd')
+    const routId = await getRoutineById(routineId);
 
     data.isPublic = isPublic;
     data.name = name;
     data.goal = goal;
     data.id = routineId;
 
-    if (routId[0].creatorId == req.user.id) {
+    if (routId.creatorId == req.user.id) {
       const updatedActivity = await updateRoutine(data);
       res.send(updatedActivity);
-    } else if(routId.creatorId != req.user.id){
-       res.status(403)
-      next({ 
+    } else if (routId.creatorId != req.user.id) {
+      res.status(403);
+      next({
         name: "UnathorizedActivityError",
-        message: UnauthorizedUpdateError(req.user.username, routId[0].name),
+        message: UnauthorizedUpdateError(req.user.username, routId.name),
         error: "error",
       });
-       
     }
   } catch (error) {
     next(error);
@@ -97,7 +96,60 @@ router.patch("/:routineId", requireUser, async (req, res, next) => {
 });
 
 // DELETE /api/routines/:routineId
+router.delete("/:routineId", requireUser, async (req, res, next) => {
+  const { routineId } = req.params;
 
+  const { name, isPublic, goal, creatorId } = req.body;
+
+  const data = {};
+  try {
+    const routId = await getRoutineById(routineId);
+
+    if (routId.creatorId == req.user.id) {
+      const deletedRout = await destroyRoutine(routineId);
+      res.send(deletedRout[0]);
+    } else if (routId.creatorId != req.user.id) {
+      res.status(403);
+      next({
+        name: "UnathorizedActivityError",
+        message: UnauthorizedDeleteError(req.user.username, routId.name),
+        error: "error",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 // POST /api/routines/:routineId/activities
+router.post("/:routineId/activities", requireUser, async (req, res, next) => {
+    const {routineId} = req.params
+  const { activityId, count, duration } = req.body;
+
+  const data = {};
+    const dup = {}
+  try {
+    data.routineId = routineId
+    data.activityId = activityId;
+    data.count = count;
+    data.duration = duration
+    
+    const newroutine = await addActivityToRoutine(data);
+    console.log(newroutine)
+    // if (newroutine.creatorId == req.user.id) {
+    //   delete newroutine.id;
+   const all = await getRoutineActivityById(routineId)
+     if(newroutine) {res.send(newroutine);
+     }else if(!newroutine.activityId === all.activityId ){
+        dup.routineId = all.activityId;
+        dup.activityId = all.activityId;
+    next({
+      name: "UnauthorizedUserError",
+      message: DuplicateRoutineActivityError(dup.routineId, dup.activityId),
+      error: "error",
+    });}
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
