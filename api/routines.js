@@ -137,9 +137,10 @@ router.post("/:routineId/activities", requireUser, async (req, res, next) => {
     console.log(newroutine)
     // if (newroutine.creatorId == req.user.id) {
     //   delete newroutine.id;
-   const all = await getRoutineActivityById(routineId)
+   const all = await getRoutineActivitiesByRoutine(routineId)
+   console.log(all, 'ddddd')
      if(newroutine) {res.send(newroutine);
-     }else if(!newroutine.activityId === all.activityId ){
+     }else {
         dup.routineId = all.activityId;
         dup.activityId = all.activityId;
     next({
