@@ -83,7 +83,7 @@ router.patch('/:activityId', requireUser, async (req, res, next) => {
     const { name, description } = req.body
     
     const newActivityData = {}
-
+ try {
     const noActivity = await getActivityById(activityId)
     if(!noActivity){
         res.send({
@@ -102,7 +102,7 @@ router.patch('/:activityId', requireUser, async (req, res, next) => {
         })
     }
 
-    try {
+   
         newActivityData.name = name
         newActivityData.description = description
         newActivityData.id = req.params.activityId

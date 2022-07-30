@@ -6,6 +6,7 @@ function requireUser (req, res, next){
             error: "error"
         })
         res.status(401)
+        
     }
     next()
 }

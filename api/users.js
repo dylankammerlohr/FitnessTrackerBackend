@@ -113,9 +113,12 @@ router.get('/:username/routines', requireUser, async (req, res, next) => {
 
 // GET /api/users/me
 router.get('/me', requireUser, async (req, res, next) => {
+  try{
     const user = await req.user
     res.send(user)
-
+  }catch(error){
+    next(error)
+  }
 })
 
 module.exports = router;
