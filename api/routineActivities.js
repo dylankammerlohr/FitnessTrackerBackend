@@ -1,6 +1,6 @@
 const express = require('express');
-const { getRoutineActivityById, updateRoutineActivity, getRoutineById } = require('../db');
-const { UnauthorizedUpdateError } = require('../errors');
+const { getRoutineActivityById, updateRoutineActivity, getRoutineById, destroyRoutineActivity, canEditRoutineActivity } = require('../db');
+const { UnauthorizedUpdateError, UnauthorizedDeleteError } = require('../errors');
 const { requireUser } = require('./utils');
 const router = express.Router();
 
@@ -36,5 +36,27 @@ router.patch('/:routineActivityId', requireUser, async (req, res, next)=>{
 });
 
 // DELETE /api/routine_activities/:routineActivityId
+router.delete("/:routineActivityId", requireUser, async (req, res, next) => {
+  const { routineActivityId } = req.params;
+  const { routineId, activityId, duration, count, id } = req.body;
+  try {
+    const routId = await getRoutineActivityById(routineActivityId);
+    const name = await getRoutineById(routId.routineId);
+
+    if (name.creatorId == req.user.id) {
+      const updatedActivity = await destroyRoutineActivity(routineActivityId);
+      res.send(updatedActivity);
+    } else if (routId.creatorId != req.user.id) {
+      res.status(403);
+      next({
+        name: "UnathorizedActivityError",
+        message: UnauthorizedDeleteError(req.user.username, name.name),
+        error: "error",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
